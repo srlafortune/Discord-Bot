@@ -1,15 +1,18 @@
-const AWS = require('aws-sdk')
-
-const docClient = new AWS.DynamoDB.DocumentClient({ region: 'us-east-2' })
+const dbUpdate = require('../utilities/dbUpdate')
 
 module.exports = {
     name: 'transfer',
     description: 'Transfer money to user',
     usage: '<user> <amount>',
     args: true,
-    execute(message, args) {
+    async execute(message, args, dbClient) {
         const taggedUser = message.mentions.users.first()
 
+        if (!message.mentions.users.size) {
+            return message.reply(
+                'you need to tag a user in order to transfer money to them!'
+            )
+        }
         const params = {
             TableName: 'Users',
             Key: { id: taggedUser.id },
@@ -21,12 +24,6 @@ module.exports = {
                 ':zero': 0,
             },
         }
-        docClient.update(params, (err, data) => {
-            if (err) {
-                console.log(err)
-            } else {
-                console.log(data)
-            }
-        })
+        await dbUpdate(params, dbClient)
     },
 }

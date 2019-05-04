@@ -1,7 +1,4 @@
-const AWS = require('aws-sdk')
 const dbGet = require('../utilities/dbGet')
-
-const docClient = new AWS.DynamoDB.DocumentClient({ region: 'us-east-2' })
 
 module.exports = {
     name: 'balance',
@@ -9,13 +6,13 @@ module.exports = {
     usage: '',
     cooldown: 5,
     aliases: [],
-    async execute(message, args) {
+    async execute(message, args, dbClient) {
         const params = {
             TableName: 'Users',
             Key: { id: message.author.id },
             ProjectionExpression: 'balance',
         }
-        const balance = await dbGet(params)
+        const balance = await dbGet(params, dbClient)
         message.channel.send(balance)
     },
 }

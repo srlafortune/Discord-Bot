@@ -1,7 +1,7 @@
-module.exports = function dbUpdate(params, dbClient) {
+module.exports = function dbTransaction(params, dbClient) {
     return new Promise((resolve, reject) => {
         try {
-            dbClient.update(params, (err, data) => {
+            dbClient.transactWrite(params, (err, data) => {
                 if (err) {
                     reject(err)
                 } else {
