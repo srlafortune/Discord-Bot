@@ -3,12 +3,14 @@ module.exports = function dbGet(params, dbClient) {
         try {
             dbClient.get(params, (err, data) => {
                 if (err) {
+                    console.error(err)
                     reject(err)
                 } else {
-                    resolve(data.Item.balance)
+                    resolve(data)
                 }
             })
         } catch (err) {
+            console.error(err)
             reject(err)
         }
     })

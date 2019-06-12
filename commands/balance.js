@@ -12,7 +12,7 @@ module.exports = {
             Key: { id: message.author.id },
             ProjectionExpression: 'balance',
         }
-        const balance = await dbGet(params, dbClient)
-        message.channel.send(balance)
+        const dbData = await dbGet(params, dbClient)
+        message.channel.send(dbData.Item.balance)
     },
 }
