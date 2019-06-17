@@ -7,12 +7,16 @@ module.exports = {
     cooldown: 5,
     aliases: [],
     async execute(message, args, dbClient) {
-        const params = {
-            TableName: 'Users',
-            Key: { id: message.author.id },
-            ProjectionExpression: 'balance',
+        if (!args.length) {
+            const params = {
+                TableName: 'Users',
+                Key: { id: message.author.id },
+                ProjectionExpression: 'balance',
+            }
+            const dbData = await dbGet(params, dbClient)
+            message.channel.send(`Your balance is ${dbData.Item.balance}`)
+        } else {
+            message.channel.send(`You can only check your balance`)
         }
-        const dbData = await dbGet(params, dbClient)
-        message.channel.send(dbData.Item.balance)
     },
 }
