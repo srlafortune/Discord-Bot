@@ -7,7 +7,7 @@ module.exports = {
     args: true,
     async execute(message, args, dbClient) {
         const taggedUser = message.mentions.users.first()
-        if (!message.member.roles.some(role => role.name === 'admin')) {
+        if (!message.member.roles.some(role => role.name === 'Admiral')) {
             return message.reply(
                 'you need the admin role to transfer currency!'
             )
