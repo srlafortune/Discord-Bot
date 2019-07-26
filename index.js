@@ -1,12 +1,14 @@
 const fs = require('fs')
 const Discord = require('discord.js')
 const AWS = require('aws-sdk')
-const { prefix, token } = require('./config.json')
+require('dotenv').config()
 
 const client = new Discord.Client()
 client.commands = new Discord.Collection()
 
 const docClient = new AWS.DynamoDB.DocumentClient({ region: 'us-east-2' })
+
+const prefix = process.env.PREFIX
 
 const commandFiles = fs
     .readdirSync('./commands')
@@ -88,4 +90,8 @@ client.on('message', message => {
     }
 })
 
-client.login(token)
+client.login()
+
+process.on('unhandledRejection', error =>
+    console.error('Uncaught Promise Rejection', error)
+)
