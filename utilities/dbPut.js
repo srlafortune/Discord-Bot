@@ -1,7 +1,7 @@
-module.exports = function dbQuery(params, dbClient) {
+module.exports = function dbPut(params, dbClient) {
     return new Promise((resolve, reject) => {
         try {
-            dbClient.query(params, (err, data) => {
+            dbClient.put(params, (err, data) => {
                 if (err) {
                     console.error(err)
                     reject(err)
