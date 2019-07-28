@@ -9,3 +9,4 @@ deploy:
     region: us-east-2
     app: Discord Bot
     env: DiscordBot-env
+    bucket_name: 'elasticbeanstalk-us-east-2-208722007891'
