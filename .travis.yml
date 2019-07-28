@@ -3,10 +3,10 @@ install: skip
 script: 'true'
 deploy:
     provider: elasticbeanstalk
-    access_key_id: AKIATBGGNC5J47WQRKHQ
+    access_key_id: AKIATBGGNC5JZM3XM2MK
     secret_access_key:
-        secure: rprfJTuafxBTJvpdRmNNXmkbZmAtp69DETJ6fNCMj8KeAYh0K+2cuOSxbVuBnPvvVQqxXHJwtgpUeO/Ko4qgPvGlEf9Qvl9GhPzKK9mQEl/G3cuPruS5NzKKbsmRdAwZp1yqmOETOGTgmjLAz5H4nZQzzDO7Gc5FOGzvuHNDjACcvuQ57zgoDtajQ7cJEl9jY23fxjQGLXzUxwPtcYsnRVayoj067s/H1BsciLyEj1HqMbJhwqJJT3R9o5JfpAfcZjLFbSn/WMxLO45LjuzSdyyUnPp06j8vjSXQjnSTG4k7TPfUcJAdI4WtF5jTpr6MCaxNBGs42y8G7geplz2mqpXA+VBhdnf/Y5QSvwiIp3h8vWo00N7OI3PleUgsr3wZ6ksXYL/Wr2r/ndU/VX2Cdz8C64JZpdKd2Ugo/kQIE2zvYChhClwhDXz0TN6RHZE7yBqVHqs119MFOu7pUo6VpgCJL65o3ufHigx70Dbwq101XxApcFO8zKjglCgbHRlJsI4t4hKRW+Ktw3hRWW4zfrIYJmcBRV1sWGzK+rhtfN5QQQHakbBlEFfUispXc9tfyAX+1InVj21zHtpQH4VvstHjZjRZeN8rd042wDqW91JsN7nCOBzeSgkluZ1GkYYJ2LP4BXYBotPDgjlBfzzUhVmuFAEawy8lii5hWQXhvOw=
+        secure: r53h93JSoO8uN5DU89rB0bCFoNAP5+3HarPCpZcuZiLk1rIOp3cwTuT0U83xZHp8S4gwKNQWglys3SGVZIk4GGikoEdsOrV1+OEp6UorboHKGBAyEvEwJamCu559JbgUUen7v/7JsTiuy59Z4rA2Pogy24NtDJRMSoUv9PFtWtC5F9YIS4JCPmaooj71GPl0DsOhDYdzvEmxrsrCIEf3NTcL0j9PtqGJUabx/a1Xyl416RRAoxsQLx7Cr/rtJtO+K8BRBQtZEnb8+2Pw1xY8y0UFoR5ptn2CsLl7Vh7tZlBTan2oIWqSINNjJc2EO4zmettcZtC2dEaf/5diFVvQxtAVUo9x+e912Z/RXMW//ujDYlOBmk7I2NBHwuZ6GbE/7EWGkWrZYEE+Fgf+zJbkPVwLrf6lklx1lCPlzURVfR/malqJSjin/l15q1uyqP2do3ZT5CPR/NKEoQ09dLAB/id+937dxlZYJ2wqjal/9uJxJJJ1bYuz07TAc95k17rCdNh+ft6y+L2Va2FHTPWLYhdtUtHXb/q/7j9GTpfBsUnSG2cZ9a69GK1bxhkvY20XftNhGAEKxK/SccNxpbFH8NpvM6xm+kcLWci00CH7Ey/8WsYkwcTQ8jbb4GrkpNCAo3pYm3j8aTdF027o4kcu6JEKk+fAAd/4yVHnedTguD4=
     region: us-east-2
     app: Discord Bot
     env: DiscordBot-env
-    bucket_name: elasticbeanstalk-us-east-2-208722007891
+    bucket_name: 'elasticbeanstalk-us-east-2-208722007891'
