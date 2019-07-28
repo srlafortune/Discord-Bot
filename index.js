@@ -1,6 +1,10 @@
 const fs = require('fs')
 const Discord = require('discord.js')
 const AWS = require('aws-sdk')
+const moment = require('moment')
+const schedule = require('node-schedule')
+const dbPut = require('./utilities/dbPut')
+
 require('dotenv').config()
 
 const client = new Discord.Client()
@@ -95,3 +99,22 @@ client.login()
 process.on('unhandledRejection', error =>
     console.error('Uncaught Promise Rejection', error)
 )
+
+// digging time
+schedule.scheduleJob({ hour: 00, minute: 00 }, async () => {
+    const currentTime = moment.utc()
+    const startHour = Math.floor(Math.random() * 23)
+
+    const digStartTime = currentTime.clone().add(startHour, 'hours')
+    const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
+    const newDigTime = {
+        TableName: 'Events',
+        Item: {
+            id: digStartTime.toString(),
+            type: 'dig',
+            startTime: digStartTime.unix(),
+            endTime: digEndTime.unix(),
+        },
+    }
+    await dbPut(newDigTime, docClient)
+})
