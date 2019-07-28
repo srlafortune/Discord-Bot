@@ -17,7 +17,9 @@ module.exports = {
                 'you need to tag a user in order to transfer money to them!'
             )
         }
-
+        if (isNaN(parseInt(args[1]))) {
+            return message.reply('this is not a number')
+        }
         const params = {
             TableName: 'Users',
             Key: { id: taggedUser.id },
@@ -30,6 +32,8 @@ module.exports = {
             },
         }
         await dbUpdate(params, dbClient)
-        message.channel.send(`You've transfered ${parseInt(args[1])} to ${taggedUser.username}`)
+        message.channel.send(
+            `You've transfered ${parseInt(args[1])} to ${taggedUser.username}`
+        )
     },
 }
