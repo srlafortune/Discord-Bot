@@ -1,3 +1,10 @@
 language: node_js
-install:
-    - npm install
+install: skip
+deploy:
+    provider: elasticbeanstalk
+    access_key_id: AKIATBGGNC5JVDVQSNNZ
+    secret_access_key:
+        secure: YcTVURpefVkREguvgnOylXJoq2eSCHCXfL4o/M8r4uOeZtYZoWzjyBfYix9VWnbgzdDmgX03xYnAY909T7U4TSNx1o5ygFrt/BX0sfsnMIkDzk/gEORGzFLoitx4srkRZImKltWa+ACyV2b8TNtk7022CSo99EYCRm1uBgjpptal1tiYpWEjIhdUJhcEX8iSH2sO0h8r7IPF8ITUyXSx3Q1VqAnNVgN/XvtqYCb1jWx3JRHj6xA557AwSXHqc6IRUfDlymClZ2nrb/gvZcDHJm30szl6IPOiU3Wq2tTzu1J2Z78jSjReCwTSlUsAzbeKYfFl2w/TPhEyMZom88KExfGISjUvHwNH35JovdszU1fbH+qhOQmP83pijUhFE/J9Qxx+HkeO9IBoHO7KsRTufuo/cCXeL838GWJwrVPLFJN79q626SCAiV+zGCIgigYzY8WHHRlV+zmxaW3tx5qNVDAFZ8iZSqDSRdDo4Nx+zqCXS3rqa2uvBD1wobk7jtuzds1Nap56EEaFE06Zv7C7lMnkc+ztQ4crR9wIL+lMzk6/DWrMmdVg+PG19w82/FAM6shbW2RbcXjutjXI/yvMlTTiP/D4EJjzYb2FZREWxFeRSDfFmBm/OtZZvPy3YJJohGeTmGdMCQb69itZCatA7Zv6qnCb1gxoQsZA21lrVZY=
+    region: us-east-2
+    app: Discord Bot
+    env: DiscordBot-env
