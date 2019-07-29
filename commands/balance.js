@@ -14,7 +14,10 @@ module.exports = {
                 ProjectionExpression: 'balance',
             }
             const dbData = await dbGet(params, dbClient)
-            if (Object.entries(dbData).length !== 0) {
+            if (
+                Object.entries(dbData).length !== 0 &&
+                Object.entries(dbData.Item).length !== 0
+            ) {
                 message.channel.send(`Your balance is ${dbData.Item.balance}`)
             } else {
                 message.channel.send(
