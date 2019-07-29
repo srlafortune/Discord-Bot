@@ -31,11 +31,13 @@ module.exports = {
                 KeyConditionExpression: '#type = :dig and startTime <= :time',
                 ExpressionAttributeNames: {
                     '#type': 'type',
+                    '#et': 'endTime',
                 },
                 ExpressionAttributeValues: {
                     ':dig': 'dig',
                     ':time': currentTime.unix(),
                 },
+                FilterExpression: '#et >= :time',
             }
             const dbQueryData = await dbQuery(queryParams, dbClient)
             console.log(dbQueryData)
