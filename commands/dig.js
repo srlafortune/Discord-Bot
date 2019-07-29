@@ -18,13 +18,12 @@ module.exports = {
         }
         const dbData = await dbGet(params, dbClient)
         const currentTime = moment.utc()
-        // if the user hasn't been initiated or dug before or it's been 24 hours
+        const lastDig = moment.unix(dbData.Item.lastDig).utc()
+        // if the user hasn't been initiated or dug before or last dig was before today
         if (
             Object.entries(dbData).length === 0 ||
             Object.entries(dbData.Item).length === 0 ||
-            (Object.entries(dbData).length !== 0 &&
-                currentTime.diff(moment.unix(dbData.Item.lastDig).utc(), 'h') >
-                    24)
+            lastDig.isBefore(currentTime, 'day')
         ) {
             const queryParams = {
                 TableName: 'Events',
@@ -32,11 +31,13 @@ module.exports = {
                 KeyConditionExpression: '#type = :dig and startTime <= :time',
                 ExpressionAttributeNames: {
                     '#type': 'type',
+                    '#et': 'endTime',
                 },
                 ExpressionAttributeValues: {
                     ':dig': 'dig',
                     ':time': currentTime.unix(),
                 },
+                FilterExpression: '#et >= :time',
             }
             const dbQueryData = await dbQuery(queryParams, dbClient)
             console.log(dbQueryData)
@@ -57,7 +58,9 @@ module.exports = {
                     },
                 }
                 await dbUpdate(updateParams, dbClient)
-                message.channel.send('TREASURE')
+                message.channel.send(
+                    'Yarghhhh treasure acquired me bucko! Have some pants'
+                )
             } else {
                 const updateParams = {
                     TableName: 'Users',
@@ -69,16 +72,12 @@ module.exports = {
                     },
                 }
                 await dbUpdate(updateParams, dbClient)
-                message.channel.send('NO TREASURE FOR YOU')
+                message.channel.send(
+                    'Argh a valiant attempt, try again tomorrow!'
+                )
             }
         } else {
-            message.reply(
-                `${moment
-                    .unix(dbData.Item.lastDig)
-                    .utc()
-                    .add(24, 'hours')
-                    .fromNow()} you can dig again`
-            )
+            message.reply("You've already dug today! Try again tomorrow")
         }
     },
 }
