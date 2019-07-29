@@ -18,12 +18,14 @@ module.exports = {
         }
         const dbData = await dbGet(params, dbClient)
         const currentTime = moment.utc()
-        const lastDig = moment.unix(dbData.Item.lastDig).utc()
         // if the user hasn't been initiated or dug before or last dig was before today
         if (
             Object.entries(dbData).length === 0 ||
             Object.entries(dbData.Item).length === 0 ||
-            lastDig.isBefore(currentTime, 'day')
+            moment
+                .unix(dbData.Item.lastDig)
+                .utc()
+                .isBefore(currentTime, 'day')
         ) {
             const queryParams = {
                 TableName: 'Events',
