@@ -103,7 +103,7 @@ process.on('unhandledRejection', error =>
 // digging time
 schedule.scheduleJob({ hour: 00, minute: 00 }, async () => {
     const currentTime = moment.utc()
-    const startHour = Math.floor(Math.random() * 23)
+    const startHour = Math.floor(Math.random() * 24)
 
     const digStartTime = currentTime.clone().add(startHour, 'hours')
     const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
