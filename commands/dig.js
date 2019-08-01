@@ -44,7 +44,17 @@ module.exports = {
             }
             const dbQueryData = await dbQuery(queryParams, dbClient)
             console.log(dbQueryData)
-            if (dbQueryData.Items.length) {
+            let digChannelObject = {}
+            if (
+                dbQueryData.Items.length &&
+                dbQueryData.Items.some(event => {
+                    if (message.channel.id === event.channel) {
+                        digChannelObject = event
+                        return true
+                    }
+                    return false
+                })
+            ) {
                 const updateParams = {
                     TableName: 'Users',
                     Key: { id: message.author.id },
@@ -61,13 +71,37 @@ module.exports = {
                     },
                 }
                 await dbUpdate(updateParams, dbClient)
-                const replyMessage = await message.channel.send(
-                    'Message received'
-                )
-                replyMessage.delete(15000)
-                message.author.send(
-                    'Yarghhhh treasure acquired me bucko! Have some pants'
-                )
+                if (digChannelObject.public) {
+                    const replyMessage = await message.channel.send(
+                        'Yarghhhh treasure acquired me bucko! Have some pants'
+                    )
+                    replyMessage.delete(15000)
+                } else {
+                    // if dig success isn't public yet update it
+                    const digUpdateParams = {
+                        TableName: 'Events',
+                        Key: {
+                            id: digChannelObject.id,
+                            type: digChannelObject.type,
+                        },
+                        UpdateExpression: 'set #public = :tru',
+                        ExpressionAttributeNames: {
+                            '#public': 'public',
+                        },
+                        ExpressionAttributeValues: {
+                            ':tru': true,
+                        },
+                    }
+                    await dbUpdate(digUpdateParams, dbClient)
+
+                    const replyMessage = await message.channel.send(
+                        'Message received'
+                    )
+                    replyMessage.delete(15000)
+                    message.author.send(
+                        'Yarghhhh treasure acquired me bucko! Have some pants'
+                    )
+                }
             } else {
                 const updateParams = {
                     TableName: 'Users',

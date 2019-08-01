@@ -50,6 +50,7 @@ client.once('ready', async () => {
                 type: 'dig',
                 startTime: digStartTime.unix(),
                 endTime: digEndTime.unix(),
+                public: false,
             },
         }
         await dbPut(newDigTime, docClient)
