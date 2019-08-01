@@ -25,8 +25,36 @@ for (const file of commandFiles) {
 
 const cooldowns = new Discord.Collection()
 
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log('Ready!')
+    // digging time
+    const guild = await client.guilds.get(process.env.SERVER_ID) // get Xandy Discord Server
+    const listedChannels = []
+    guild.channels.forEach(channel => {
+        if (
+            channel.type === 'text' &&
+            channel.permissionsFor(client.user).has('VIEW_CHANNEL')
+        )
+            listedChannels.push(channel.name)
+    })
+    schedule.scheduleJob({ hour: 00, minute: 00 }, async () => {
+        const currentTime = moment.utc()
+        const startHour = Math.floor(Math.random() * 24)
+
+        const digStartTime = currentTime.clone().add(startHour, 'hours')
+        const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
+        const newDigTime = {
+            TableName: 'Events',
+            Item: {
+                id: digStartTime.toString(),
+                type: 'dig',
+                startTime: digStartTime.unix(),
+                endTime: digEndTime.unix(),
+                public: false,
+            },
+        }
+        await dbPut(newDigTime, docClient)
+    })
 })
 
 client.on('message', message => {
@@ -99,22 +127,3 @@ client.login()
 process.on('unhandledRejection', error =>
     console.error('Uncaught Promise Rejection', error)
 )
-
-// digging time
-schedule.scheduleJob({ hour: 00, minute: 00 }, async () => {
-    const currentTime = moment.utc()
-    const startHour = Math.floor(Math.random() * 24)
-
-    const digStartTime = currentTime.clone().add(startHour, 'hours')
-    const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
-    const newDigTime = {
-        TableName: 'Events',
-        Item: {
-            id: digStartTime.toString(),
-            type: 'dig',
-            startTime: digStartTime.unix(),
-            endTime: digEndTime.unix(),
-        },
-    }
-    await dbPut(newDigTime, docClient)
-})
