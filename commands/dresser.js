@@ -7,7 +7,7 @@ const channelFlavorText = require('../channelFlavorText.json')
 const directMessageFlavorText = require('../directMessageFlavorText.json')
 
 module.exports = {
-    name: 'dig',
+    name: 'dresser',
     description: 'dig for treasure',
     usage: '',
     cooldown: 5,
@@ -88,7 +88,7 @@ module.exports = {
                     await dbUpdate(updateParams, dbClient)
                     if (digChannelObject.public) {
                         const replyMessage = await message.channel.send(
-                            channelFlavorText.digStrikeGold
+                            channelFlavorText.digStrikeGold[0]
                         )
                         replyMessage.delete(60000)
                     } else if (digChannelObject.hits < 3) {
@@ -115,11 +115,11 @@ module.exports = {
                         await dbUpdate(digUpdateParams, dbClient)
 
                         const replyMessage = await message.channel.send(
-                            channelFlavorText.digBeforeGold
+                            channelFlavorText.digBeforeGold[0]
                         )
                         replyMessage.delete(60000)
                         message.author.send(
-                            directMessageFlavorText.digHitHidden
+                            directMessageFlavorText.digHitHidden[0]
                         )
                     } else if (digChannelObject.hits >= 3) {
                         // if dig success isn't public yet update it
@@ -146,11 +146,11 @@ module.exports = {
                         await dbUpdate(digUpdateParams, dbClient)
 
                         const replyMessage = await message.channel.send(
-                            channelFlavorText.digBeforeGold
+                            channelFlavorText.digBeforeGold[0]
                         )
                         replyMessage.delete(60000)
                         message.author.send(
-                            directMessageFlavorText.digHitUncover
+                            directMessageFlavorText.digHitUncover[0]
                         )
                     }
                 } else {
@@ -165,24 +165,24 @@ module.exports = {
                     }
                     await dbUpdate(updateParams, dbClient)
                     const replyMessage = await message.channel.send(
-                        channelFlavorText.digBeforeGold
+                        channelFlavorText.digBeforeGold[0]
                     )
                     replyMessage.delete(60000)
-                    message.author.send(directMessageFlavorText.digMiss)
+                    message.author.send(directMessageFlavorText.digMiss[0])
                 }
             } else {
                 const replyMessage = await message.reply(
-                    channelFlavorText.digBeforeGold
+                    channelFlavorText.digBeforeGold[0]
                 )
                 replyMessage.delete(60000)
-                message.author.send(directMessageFlavorText.digCooldownWeek)
+                message.author.send(directMessageFlavorText.digCooldownWeek[0])
             }
         } else {
             const replyMessage = await message.reply(
-                channelFlavorText.digBeforeGold
+                channelFlavorText.digBeforeGold[0]
             )
             replyMessage.delete(60000)
-            message.author.send(directMessageFlavorText.digCooldown)
+            message.author.send(directMessageFlavorText.digCooldown[0])
         }
     },
 }
