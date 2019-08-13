@@ -3,7 +3,7 @@ const Discord = require('discord.js')
 const AWS = require('aws-sdk')
 const moment = require('moment')
 const schedule = require('node-schedule')
-const dbPut = require('./utilities/dbPut')
+const dbBatchWrite = require('./utilities/dbBatchWrite')
 
 require('dotenv').config()
 
@@ -35,25 +35,41 @@ client.once('ready', async () => {
             channel.type === 'text' &&
             channel.permissionsFor(client.user).has('VIEW_CHANNEL')
         )
-            listedChannels.push(channel.name)
+            listedChannels.push(channel.id)
     })
-    schedule.scheduleJob({ hour: 00, minute: 00 }, async () => {
+    schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 0 }, async () => {
         const currentTime = moment.utc()
         const startHour = Math.floor(Math.random() * 24)
 
         const digStartTime = currentTime.clone().add(startHour, 'hours')
         const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
+
+        const digTimes = []
+        for (let index = 0; index < 6 - moment().day(); index++) {
+            digTimes.push({
+                digStartTime: digStartTime.add(index, 'days'),
+                digEndTime: digEndTime.add(index, 'days'),
+            })
+        }
+
         const newDigTime = {
-            TableName: 'Events',
-            Item: {
-                id: digStartTime.toString(),
-                type: 'dig',
-                startTime: digStartTime.unix(),
-                endTime: digEndTime.unix(),
-                public: false,
+            RequestItems: {
+                Events: digTimes.map(digTime => ({
+                    PutRequest: {
+                        Item: {
+                            id: digStartTime.startOf('day').toString(),
+                            type: 'dig',
+                            startTime: digTime.digStartTime.unix(),
+                            endTime: digTime.digEndTime.unix(),
+                            public: false,
+                            hits: 0,
+                        },
+                    },
+                })),
             },
         }
-        await dbPut(newDigTime, docClient)
+
+        await dbBatchWrite(newDigTime, docClient)
     })
 })
 
