@@ -1,7 +1,7 @@
 const dbGet = require('../utilities/dbGet')
 
 module.exports = {
-    name: 'balance',
+    name: 'dresser',
     description: 'Check balance',
     usage: '',
     cooldown: 5,
