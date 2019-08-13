@@ -32,11 +32,12 @@ module.exports = {
                 .isBefore(currentTime, 'day')
         ) {
             if (
-                dbData.Item.lastTreasure &&
-                moment
-                    .unix(dbData.Item.lastTreasure)
-                    .utc()
-                    .isBefore(currentTime, 'week')
+                !dbData.Item.lastTreasure ||
+                (dbData.Item.lastTreasure &&
+                    moment
+                        .unix(dbData.Item.lastTreasure)
+                        .utc()
+                        .isBefore(currentTime, 'week'))
             ) {
                 const queryParams = {
                     TableName: 'Events',
@@ -54,10 +55,9 @@ module.exports = {
                     FilterExpression: '#et >= :time',
                 }
                 const dbQueryData = await dbQuery(queryParams, dbClient)
-                console.log(dbQueryData)
                 let digChannelObject = {}
 
-                for (let index = 0; index < dbQuery.Items.length; index++) {
+                for (let index = 0; index < dbQueryData.Items.length; index++) {
                     const event = dbQuery.Items[index]
                     if (message.channel.id === event.channel && event.public) {
                         digChannelObject = event
