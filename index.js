@@ -33,9 +33,11 @@ client.once('ready', async () => {
     guild.channels.forEach(channel => {
         if (
             channel.type === 'text' &&
-            channel.permissionsFor(client.user).has('VIEW_CHANNEL')
-        )
+            channel.parentID === process.env.BOT_CATEGORY_ID &&
+            channel.permissionsFor(client.user).has('SEND_MESSAGES')
+        ) {
             listedChannels.push(channel.id)
+        }
     })
     schedule.scheduleJob({ hour: 00, minute: 00, dayOfWeek: 0 }, async () => {
         const currentTime = moment.utc()
