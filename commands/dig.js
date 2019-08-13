@@ -3,6 +3,9 @@ const dbGet = require('../utilities/dbGet')
 const dbQuery = require('../utilities/dbQuery')
 const dbUpdate = require('../utilities/dbUpdate')
 
+const channelFlavorText = require('../channelFlavorText.json')
+const directMessageFlavorText = require('../directMessageFlavorText.json')
+
 module.exports = {
     name: 'dig',
     description: 'dig for treasure',
@@ -11,7 +14,7 @@ module.exports = {
     guildOnly: true,
     aliases: [],
     async execute(message, args, dbClient) {
-        message.delete(15000)
+        message.delete(60000)
         const params = {
             TableName: 'Users',
             Key: { id: message.author.id },
@@ -28,103 +31,158 @@ module.exports = {
                 .utc()
                 .isBefore(currentTime, 'day')
         ) {
-            const queryParams = {
-                TableName: 'Events',
-                IndexName: 'type-startTime-index',
-                KeyConditionExpression: '#type = :dig and startTime <= :time',
-                ExpressionAttributeNames: {
-                    '#type': 'type',
-                    '#et': 'endTime',
-                },
-                ExpressionAttributeValues: {
-                    ':dig': 'dig',
-                    ':time': currentTime.unix(),
-                },
-                FilterExpression: '#et >= :time',
-            }
-            const dbQueryData = await dbQuery(queryParams, dbClient)
-            console.log(dbQueryData)
-            let digChannelObject = {}
             if (
-                dbQueryData.Items.length &&
-                dbQueryData.Items.some(event => {
-                    if (message.channel.id === event.channel) {
-                        digChannelObject = event
-                        return true
-                    }
-                    return false
-                })
+                dbData.Item.lastTreasure &&
+                moment
+                    .unix(dbData.Item.lastTreasure)
+                    .utc()
+                    .isBefore(currentTime, 'week')
             ) {
-                const updateParams = {
-                    TableName: 'Users',
-                    Key: { id: message.author.id },
-                    UpdateExpression:
-                        'set #balance = if_not_exists(#balance, :zero) + :value, #lastDig = :timevalue',
+                const queryParams = {
+                    TableName: 'Events',
+                    IndexName: 'type-startTime-index',
+                    KeyConditionExpression:
+                        '#type = :dig and startTime <= :time',
                     ExpressionAttributeNames: {
-                        '#balance': 'balance',
-                        '#lastDig': 'lastDig',
+                        '#type': 'type',
+                        '#et': 'endTime',
                     },
                     ExpressionAttributeValues: {
-                        ':value': 1,
-                        ':zero': 0,
-                        ':timevalue': currentTime.unix(),
+                        ':dig': 'dig',
+                        ':time': currentTime.unix(),
                     },
+                    FilterExpression: '#et >= :time',
                 }
-                await dbUpdate(updateParams, dbClient)
-                if (digChannelObject.public) {
-                    const replyMessage = await message.channel.send(
-                        'Yarghhhh treasure acquired me bucko! Have some pants'
-                    )
-                    replyMessage.delete(15000)
-                } else {
-                    // if dig success isn't public yet update it
-                    const digUpdateParams = {
-                        TableName: 'Events',
-                        Key: {
-                            id: digChannelObject.id,
-                            type: digChannelObject.type,
-                        },
-                        UpdateExpression: 'set #public = :tru',
+                const dbQueryData = await dbQuery(queryParams, dbClient)
+                console.log(dbQueryData)
+                let digChannelObject = {}
+
+                for (let index = 0; index < dbQuery.Items.length; index++) {
+                    const event = dbQuery.Items[index]
+                    if (message.channel.id === event.channel && event.public) {
+                        digChannelObject = event
+                        break
+                    } else if (message.channel.id === event.channel) {
+                        digChannelObject = event
+                    }
+                }
+
+                // if there is an active dig and in the right channel
+                if (Object.entries(digChannelObject).length === 0) {
+                    const updateParams = {
+                        TableName: 'Users',
+                        Key: { id: message.author.id },
+                        UpdateExpression:
+                            'set #balance = if_not_exists(#balance, :zero) + :value, #lastDig = :timevalue, #lastTreasure = :timevalue',
                         ExpressionAttributeNames: {
-                            '#public': 'public',
+                            '#balance': 'balance',
+                            '#lastDig': 'lastDig',
+                            '#lastTreasure': 'lastTreasure',
                         },
                         ExpressionAttributeValues: {
-                            ':tru': true,
+                            ':value': 1,
+                            ':zero': 0,
+                            ':timevalue': currentTime.unix(),
                         },
                     }
-                    await dbUpdate(digUpdateParams, dbClient)
+                    await dbUpdate(updateParams, dbClient)
+                    if (digChannelObject.public) {
+                        const replyMessage = await message.channel.send(
+                            channelFlavorText.digStrikeGold
+                        )
+                        replyMessage.delete(60000)
+                    } else if (digChannelObject.hits < 3) {
+                        // if dig success isn't public yet update it
+                        const digUpdateParams = {
+                            TableName: 'Events',
+                            Key: {
+                                id: digChannelObject.id,
+                                type: digChannelObject.type,
+                            },
+                            UpdateExpression:
+                                'SET #public = :tru ADD #hits :one',
+                            ExpressionAttributeNames: {
+                                '#public': 'public',
+                                '#endtime': 'endtime',
+                                '#hits': 'hits',
+                            },
+                            ExpressionAttributeValues: {
+                                ':tru': true,
+                                ':time': currentTime.endOf('week').unix(),
+                                ':one': 1,
+                            },
+                        }
+                        await dbUpdate(digUpdateParams, dbClient)
 
+                        const replyMessage = await message.channel.send(
+                            channelFlavorText.digBeforeGold
+                        )
+                        replyMessage.delete(60000)
+                        message.author.send(
+                            directMessageFlavorText.digHitHidden
+                        )
+                    } else if (digChannelObject.hits >= 3) {
+                        // if dig success isn't public yet update it
+                        const digUpdateParams = {
+                            TableName: 'Events',
+                            Key: {
+                                id: digChannelObject.id,
+                                type: digChannelObject.type,
+                            },
+                            UpdateExpression:
+                                'SET #public = :tru, #endtime = :time ADD #hits :one',
+                            ExpressionAttributeNames: {
+                                '#public': 'public',
+                                '#endtime': 'endtime',
+                            },
+                            ExpressionAttributeValues: {
+                                ':tru': true,
+                                ':time': currentTime
+                                    .clone()
+                                    .endOf('week')
+                                    .unix(),
+                            },
+                        }
+                        await dbUpdate(digUpdateParams, dbClient)
+
+                        const replyMessage = await message.channel.send(
+                            channelFlavorText.digBeforeGold
+                        )
+                        replyMessage.delete(60000)
+                        message.author.send(
+                            directMessageFlavorText.digHitUncover
+                        )
+                    }
+                } else {
+                    const updateParams = {
+                        TableName: 'Users',
+                        Key: { id: message.author.id },
+                        UpdateExpression: 'set #lastDig = :value',
+                        ExpressionAttributeNames: { '#lastDig': 'lastDig' },
+                        ExpressionAttributeValues: {
+                            ':value': currentTime.unix(),
+                        },
+                    }
+                    await dbUpdate(updateParams, dbClient)
                     const replyMessage = await message.channel.send(
-                        'Message received'
+                        channelFlavorText.digBeforeGold
                     )
-                    replyMessage.delete(15000)
-                    message.author.send(
-                        'Yarghhhh treasure acquired me bucko! Have some pants'
-                    )
+                    replyMessage.delete(60000)
+                    message.author.send(directMessageFlavorText.digMiss)
                 }
             } else {
-                const updateParams = {
-                    TableName: 'Users',
-                    Key: { id: message.author.id },
-                    UpdateExpression: 'set #lastDig = :value',
-                    ExpressionAttributeNames: { '#lastDig': 'lastDig' },
-                    ExpressionAttributeValues: {
-                        ':value': currentTime.unix(),
-                    },
-                }
-                await dbUpdate(updateParams, dbClient)
-                const replyMessage = await message.channel.send(
-                    'Message received'
+                const replyMessage = await message.reply(
+                    channelFlavorText.digBeforeGold
                 )
-                replyMessage.delete(15000)
-                message.author.send(
-                    'Argh a valiant attempt, try again tomorrow!'
-                )
+                replyMessage.delete(60000)
+                message.author.send(directMessageFlavorText.digCooldownWeek)
             }
         } else {
-            const replyMessage = await message.reply('Message received')
-            replyMessage.delete(15000)
-            message.author.send("You've already dug today! Try again tomorrow")
+            const replyMessage = await message.reply(
+                channelFlavorText.digBeforeGold
+            )
+            replyMessage.delete(60000)
+            message.author.send(directMessageFlavorText.digCooldown)
         }
     },
 }
