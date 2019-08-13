@@ -7,7 +7,7 @@ const channelFlavorText = require('../channelFlavorText.json')
 const directMessageFlavorText = require('../directMessageFlavorText.json')
 
 module.exports = {
-    name: 'dresser',
+    name: 'dig',
     description: 'dig for treasure',
     usage: '',
     cooldown: 5,
