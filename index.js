@@ -158,6 +158,4 @@ client.on('error', m => logger.log('error', m))
 client.login()
 
 process.on('uncaughtException', error => logger.log('error', error))
-process.on('unhandledRejection', error =>
-    logger.log('Uncaught Promise Rejection', error)
-)
+process.on('unhandledRejection', error => logger.log('error', error))

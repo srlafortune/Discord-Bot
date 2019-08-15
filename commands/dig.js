@@ -18,26 +18,26 @@ module.exports = {
         const params = {
             TableName: 'Users',
             Key: { id: message.author.id },
-            ProjectionExpression: 'lastDig',
+            ProjectionExpression: 'lastDig, lastTreasure',
         }
+
         const dbData = await dbGet(params, dbClient)
         const currentTime = moment.utc()
         // if the user hasn't been initiated or dug before or last dig was before today
         if (
-            Object.entries(dbData).length === 0 ||
-            Object.entries(dbData.Item).length === 0 ||
+            !dbData.Item.lastTreasure ||
             moment
-                .unix(dbData.Item.lastDig)
+                .unix(dbData.Item.lastTreasure)
                 .utc()
-                .isBefore(currentTime, 'day')
+                .isBefore(currentTime, 'week')
         ) {
             if (
-                !dbData.Item.lastTreasure ||
-                (dbData.Item.lastTreasure &&
-                    moment
-                        .unix(dbData.Item.lastTreasure)
-                        .utc()
-                        .isBefore(currentTime, 'week'))
+                Object.entries(dbData).length === 0 ||
+                Object.entries(dbData.Item).length === 0 ||
+                moment
+                    .unix(dbData.Item.lastDig)
+                    .utc()
+                    .isBefore(currentTime, 'day')
             ) {
                 const queryParams = {
                     TableName: 'Events',
@@ -57,27 +57,18 @@ module.exports = {
                 const dbQueryData = await dbQuery(queryParams, dbClient)
                 let digChannelObject = {}
 
-                if (dbQueryData.Items.length) {
-                    for (
-                        let index = 0;
-                        index < dbQueryData.Items.length;
-                        index++
-                    ) {
-                        const event = dbQuery.Items[index]
-                        if (
-                            message.channel.id === event.channel &&
-                            event.public
-                        ) {
-                            digChannelObject = event
-                            break
-                        } else if (message.channel.id === event.channel) {
-                            digChannelObject = event
-                        }
+                for (let index = 0; index < dbQueryData.Items.length; index++) {
+                    const event = dbQueryData.Items[index]
+                    if (message.channel.id === event.channel && event.public) {
+                        digChannelObject = event
+                        break
+                    } else if (message.channel.id === event.channel) {
+                        digChannelObject = event
                     }
                 }
 
                 // if there is an active dig and in the right channel
-                if (Object.entries(digChannelObject).length === 0) {
+                if (Object.entries(digChannelObject).length > 0) {
                     const updateParams = {
                         TableName: 'Users',
                         Key: { id: message.author.id },
@@ -100,7 +91,7 @@ module.exports = {
                             channelFlavorText.digStrikeGold[0]
                         )
                         replyMessage.delete(60000)
-                    } else if (digChannelObject.hits < 3) {
+                    } else if (digChannelObject.hits < 2) {
                         // if dig success isn't public yet update it
                         const digUpdateParams = {
                             TableName: 'Events',
@@ -108,16 +99,11 @@ module.exports = {
                                 id: digChannelObject.id,
                                 type: digChannelObject.type,
                             },
-                            UpdateExpression:
-                                'SET #public = :tru ADD #hits :one',
+                            UpdateExpression: 'ADD #hits :one',
                             ExpressionAttributeNames: {
-                                '#public': 'public',
-                                '#endtime': 'endtime',
                                 '#hits': 'hits',
                             },
                             ExpressionAttributeValues: {
-                                ':tru': true,
-                                ':time': currentTime.endOf('week').unix(),
                                 ':one': 1,
                             },
                         }
@@ -130,7 +116,7 @@ module.exports = {
                         message.author.send(
                             directMessageFlavorText.digHitHidden[0]
                         )
-                    } else if (digChannelObject.hits >= 3) {
+                    } else if (digChannelObject.hits >= 2) {
                         // if dig success isn't public yet update it
                         const digUpdateParams = {
                             TableName: 'Events',
@@ -139,7 +125,7 @@ module.exports = {
                                 type: digChannelObject.type,
                             },
                             UpdateExpression:
-                                'SET #public = :tru, #endtime = :time ADD #hits :one',
+                                'SET #public = :tru, #endtime = :time',
                             ExpressionAttributeNames: {
                                 '#public': 'public',
                                 '#endtime': 'endtime',
@@ -184,14 +170,14 @@ module.exports = {
                     channelFlavorText.digBeforeGold[0]
                 )
                 replyMessage.delete(60000)
-                message.author.send(directMessageFlavorText.digCooldownWeek[0])
+                message.author.send(directMessageFlavorText.digCooldown[0])
             }
         } else {
             const replyMessage = await message.reply(
                 channelFlavorText.digBeforeGold[0]
             )
             replyMessage.delete(60000)
-            message.author.send(directMessageFlavorText.digCooldown[0])
+            message.author.send(directMessageFlavorText.digCooldownWeek[0])
         }
     },
 }
