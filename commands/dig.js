@@ -57,13 +57,22 @@ module.exports = {
                 const dbQueryData = await dbQuery(queryParams, dbClient)
                 let digChannelObject = {}
 
-                for (let index = 0; index < dbQueryData.Items.length; index++) {
-                    const event = dbQuery.Items[index]
-                    if (message.channel.id === event.channel && event.public) {
-                        digChannelObject = event
-                        break
-                    } else if (message.channel.id === event.channel) {
-                        digChannelObject = event
+                if (dbQueryData.Items.length) {
+                    for (
+                        let index = 0;
+                        index < dbQueryData.Items.length;
+                        index++
+                    ) {
+                        const event = dbQuery.Items[index]
+                        if (
+                            message.channel.id === event.channel &&
+                            event.public
+                        ) {
+                            digChannelObject = event
+                            break
+                        } else if (message.channel.id === event.channel) {
+                            digChannelObject = event
+                        }
                     }
                 }
 
