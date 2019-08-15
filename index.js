@@ -4,6 +4,7 @@ const AWS = require('aws-sdk')
 const moment = require('moment')
 const schedule = require('node-schedule')
 const dbBatchWrite = require('./utilities/dbBatchWrite')
+const winston = require('winston')
 
 require('dotenv').config()
 
