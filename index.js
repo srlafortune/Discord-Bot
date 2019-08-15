@@ -7,6 +7,16 @@ const dbBatchWrite = require('./utilities/dbBatchWrite')
 
 require('dotenv').config()
 
+const logger = winston.createLogger({
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'log' }),
+    ],
+    format: winston.format.printf(
+        log => `[${log.level.toUpperCase()}] - ${log.message}`
+    ),
+})
+
 const client = new Discord.Client()
 client.commands = new Discord.Collection()
 
@@ -26,7 +36,7 @@ for (const file of commandFiles) {
 const cooldowns = new Discord.Collection()
 
 client.once('ready', async () => {
-    console.log('Ready!')
+    logger.log('info', 'The bot is online!')
     // digging time
     const guild = await client.guilds.get(process.env.SERVER_ID) // get Xandy Discord Server
     const listedChannels = []
@@ -140,8 +150,13 @@ client.on('message', message => {
     }
 })
 
+client.on('debug', m => logger.log('debug', m))
+client.on('warn', m => logger.log('warn', m))
+client.on('error', m => logger.log('error', m))
+
 client.login()
 
+process.on('uncaughtException', error => logger.log('error', error))
 process.on('unhandledRejection', error =>
-    console.error('Uncaught Promise Rejection', error)
+    logger.log('Uncaught Promise Rejection', error)
 )
