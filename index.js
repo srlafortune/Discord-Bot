@@ -58,24 +58,30 @@ client.once('ready', async () => {
         const digEndTime = currentTime.clone().add(startHour + 1, 'hours')
 
         const digTimes = []
-        for (let index = 0; index < 6 - moment().day(); index++) {
+        for (let index = 0; index <= 6 - moment().day(); index++) {
             digTimes.push({
-                digStartTime: digStartTime.add(index, 'days'),
-                digEndTime: digEndTime.add(index, 'days'),
+                digStartTime: digStartTime.clone().add(index, 'days'),
+                digEndTime: digEndTime.clone().add(index, 'days'),
             })
         }
 
+        const channel =
+            listedChannels[Math.floor(Math.random() * listedChannels.length)]
         const newDigTime = {
             RequestItems: {
                 Events: digTimes.map(digTime => ({
                     PutRequest: {
                         Item: {
-                            id: digStartTime.startOf('day').toString(),
+                            id: digStartTime
+                                .clone()
+                                .startOf('day')
+                                .toString(),
                             type: 'dig',
                             startTime: digTime.digStartTime.unix(),
                             endTime: digTime.digEndTime.unix(),
                             public: false,
                             hits: 0,
+                            channel,
                         },
                     },
                 })),
