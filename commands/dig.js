@@ -25,6 +25,8 @@ module.exports = {
         const currentTime = moment.utc()
         // if the user hasn't been initiated or dug before or last dig was before today
         if (
+            Object.entries(dbData).length === 0 ||
+            Object.entries(dbData.Item).length === 0 ||
             !dbData.Item.lastTreasure ||
             moment
                 .unix(dbData.Item.lastTreasure)
@@ -34,6 +36,7 @@ module.exports = {
             if (
                 Object.entries(dbData).length === 0 ||
                 Object.entries(dbData.Item).length === 0 ||
+                !dbData.Item.lastDig ||
                 moment
                     .unix(dbData.Item.lastDig)
                     .utc()
