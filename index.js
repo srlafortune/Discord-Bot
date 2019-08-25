@@ -72,7 +72,7 @@ client.once('ready', async () => {
                 Events: digTimes.map(digTime => ({
                     PutRequest: {
                         Item: {
-                            id: digStartTime
+                            id: digTime.digStartTime
                                 .clone()
                                 .startOf('day')
                                 .toString(),
