@@ -14,7 +14,7 @@ module.exports = {
     guildOnly: true,
     aliases: [],
     async execute(message, args, dbClient) {
-        message.delete(60000)
+        // message.delete(60000)
         const params = {
             TableName: 'Users',
             Key: { id: message.author.id },
@@ -93,7 +93,7 @@ module.exports = {
                         const replyMessage = await message.channel.send(
                             channelFlavorText.digStrikeGold[0]
                         )
-                        replyMessage.delete(60000)
+                        // replyMessage.delete(60000)
                     } else if (digChannelObject.hits < 2) {
                         // if dig success isn't public yet update it
                         const digUpdateParams = {
@@ -115,7 +115,7 @@ module.exports = {
                         const replyMessage = await message.channel.send(
                             channelFlavorText.digBeforeGold[0]
                         )
-                        replyMessage.delete(60000)
+                        // replyMessage.delete(60000)
                         message.author.send(
                             directMessageFlavorText.digHitHidden[0]
                         )
@@ -146,7 +146,7 @@ module.exports = {
                         const replyMessage = await message.channel.send(
                             channelFlavorText.digBeforeGold[0]
                         )
-                        replyMessage.delete(60000)
+                        // replyMessage.delete(60000)
                         message.author.send(
                             directMessageFlavorText.digHitUncover[0]
                         )
@@ -165,21 +165,21 @@ module.exports = {
                     const replyMessage = await message.channel.send(
                         channelFlavorText.digBeforeGold[0]
                     )
-                    replyMessage.delete(60000)
+                    // replyMessage.delete(60000)
                     message.author.send(directMessageFlavorText.digMiss[0])
                 }
             } else {
                 const replyMessage = await message.reply(
                     channelFlavorText.digBeforeGold[0]
                 )
-                replyMessage.delete(60000)
+                // replyMessage.delete(60000)
                 message.author.send(directMessageFlavorText.digCooldown[0])
             }
         } else {
             const replyMessage = await message.reply(
                 channelFlavorText.digBeforeGold[0]
             )
-            replyMessage.delete(60000)
+            // replyMessage.delete(60000)
             message.author.send(directMessageFlavorText.digCooldownWeek[0])
         }
     },
