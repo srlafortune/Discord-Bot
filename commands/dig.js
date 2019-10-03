@@ -131,7 +131,7 @@ module.exports = {
                                 'SET #public = :tru, #endtime = :time',
                             ExpressionAttributeNames: {
                                 '#public': 'public',
-                                '#endtime': 'endtime',
+                                '#endtime': 'endTime',
                             },
                             ExpressionAttributeValues: {
                                 ':tru': true,
